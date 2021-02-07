@@ -4,53 +4,53 @@ class _StyledAnimatedModel {
   final Duration duration;
   final Curve curve;
   _StyledAnimatedModel({
-    @required this.duration,
-    this.curve,
+    required this.duration,
+    this.curve = Curves.linear,
   });
 }
 
 class _StyledInheritedAnimation extends InheritedWidget {
   final _StyledAnimatedModel animation;
 
-  _StyledInheritedAnimation({this.animation, Widget child})
+  _StyledInheritedAnimation({required this.animation, required Widget child})
       : super(child: child);
 
   @override
   bool updateShouldNotify(_StyledInheritedAnimation oldAnimation) =>
-      !(oldAnimation?.animation?.duration == animation?.duration &&
-          oldAnimation?.animation?.curve == animation?.curve);
+      !(oldAnimation.animation.duration == animation.duration &&
+          oldAnimation.animation.curve == animation.curve);
 
-  static _StyledInheritedAnimation of(BuildContext context) =>
+  static _StyledInheritedAnimation? of(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<_StyledInheritedAnimation>();
 }
 
 class _StyledAnimatedBuilder extends StatelessWidget {
-  _StyledAnimatedBuilder({@required this.builder});
+  _StyledAnimatedBuilder({required this.builder});
 
   final Widget Function(_StyledAnimatedModel) builder;
 
   @override
   Widget build(BuildContext context) {
-    _StyledAnimatedModel animation =
+    _StyledAnimatedModel? animation =
         _StyledInheritedAnimation.of(context)?.animation;
     assert(
       animation != null,
       '[styled_widget]: Tried to animate a widget without an animation specified. Define your animation using .animate() as an ancestor of the widget you are trying to animate',
     );
-    return builder(animation);
+    return builder(animation!);
   }
 }
 
 class _AnimatedDecorationBox extends ImplicitlyAnimatedWidget {
   /// The [curve] and [duration] arguments must not be null.
   _AnimatedDecorationBox({
-    Key key,
+    Key? key,
     this.decoration,
     this.position = DecorationPosition.background,
     this.child,
     Curve curve = Curves.linear,
-    @required Duration duration,
-    VoidCallback onEnd,
+    required Duration duration,
+    VoidCallback? onEnd,
   })  : assert(decoration == null || decoration.debugAssertIsValid()),
         super(
           key: key,
@@ -67,14 +67,14 @@ class _AnimatedDecorationBox extends ImplicitlyAnimatedWidget {
   /// will attempt to be as small as possible.
   ///
   /// {@macro flutter.widgets.child}
-  final Widget child;
+  final Widget? child;
 
   /// The decoration to paint behind the [child].
   ///
   /// A shorthand for specifying just a solid color is available in the
   /// constructor: set the `color` argument instead of the `decoration`
   /// argument.
-  final Decoration decoration;
+  final Decoration? decoration;
 
   final DecorationPosition position;
 
@@ -92,19 +92,19 @@ class _AnimatedDecorationBox extends ImplicitlyAnimatedWidget {
 
 class _AnimatedDecorationBoxState
     extends AnimatedWidgetBaseState<_AnimatedDecorationBox> {
-  DecorationTween _decoration;
+  late DecorationTween _decoration;
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
     _decoration = visitor(_decoration, widget.decoration,
-        (dynamic value) => DecorationTween(begin: value));
+        (dynamic value) => DecorationTween(begin: value)) as DecorationTween;
   }
 
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
       child: widget.child,
-      decoration: _decoration?.evaluate(animation),
+      decoration: _decoration.evaluate(animation),
       position: widget.position,
     );
   }
@@ -120,12 +120,12 @@ class _AnimatedDecorationBoxState
 class _AnimatedConstrainedBox extends ImplicitlyAnimatedWidget {
   /// The [curve] and [duration] arguments must not be null.
   _AnimatedConstrainedBox({
-    Key key,
+    Key? key,
     this.constraints,
     this.child,
     Curve curve = Curves.linear,
-    @required Duration duration,
-    VoidCallback onEnd,
+    required Duration duration,
+    VoidCallback? onEnd,
   })  : assert(constraints == null || constraints.debugAssertIsValid()),
         super(
           key: key,
@@ -142,7 +142,7 @@ class _AnimatedConstrainedBox extends ImplicitlyAnimatedWidget {
   /// will attempt to be as small as possible.
   ///
   /// {@macro flutter.widgets.child}
-  final Widget child;
+  final Widget? child;
 
   /// Additional constraints to apply to the child.
   ///
@@ -150,7 +150,7 @@ class _AnimatedConstrainedBox extends ImplicitlyAnimatedWidget {
   /// `constraints` argument to set this property.
   ///
   /// The [padding] goes inside the constraints.
-  final BoxConstraints constraints;
+  final BoxConstraints? constraints;
 
   @override
   _AnimatedConstrainedBoxState createState() => _AnimatedConstrainedBoxState();
@@ -166,19 +166,19 @@ class _AnimatedConstrainedBox extends ImplicitlyAnimatedWidget {
 
 class _AnimatedConstrainedBoxState
     extends AnimatedWidgetBaseState<_AnimatedConstrainedBox> {
-  BoxConstraintsTween _constraints;
+  late BoxConstraintsTween _constraints;
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
     _constraints = visitor(_constraints, widget.constraints,
-        (dynamic value) => BoxConstraintsTween(begin: value));
+        (dynamic value) => BoxConstraintsTween(begin: value)) as BoxConstraintsTween;
   }
 
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
       child: widget.child,
-      constraints: _constraints?.evaluate(animation),
+      constraints: _constraints.evaluate(animation),
     );
   }
 
@@ -196,14 +196,14 @@ class _AnimatedTransform extends ImplicitlyAnimatedWidget {
   ///
   /// The [curve] and [duration] arguments must not be null.
   _AnimatedTransform({
-    Key key,
+    Key? key,
     this.transform,
     this.origin,
     this.alignment,
     this.transformHitTests = true,
     this.child,
     Curve curve = Curves.linear,
-    @required Duration duration,
+    required Duration duration,
   }) : super(
           key: key,
           curve: curve,
@@ -218,16 +218,16 @@ class _AnimatedTransform extends ImplicitlyAnimatedWidget {
   /// will attempt to be as small as possible.
   ///
   /// {@macro flutter.widgets.child}
-  final Widget child;
+  final Widget? child;
 
-  final Offset origin;
+  final Offset? origin;
 
-  final AlignmentGeometry alignment;
+  final AlignmentGeometry? alignment;
 
   final bool transformHitTests;
 
   /// The transformation matrix to apply before painting the container.
-  final Matrix4 transform;
+  final Matrix4? transform;
 
   @override
   _AnimatedTransformState createState() => _AnimatedTransformState();
@@ -245,23 +245,23 @@ class _AnimatedTransform extends ImplicitlyAnimatedWidget {
 
 class _AnimatedTransformState
     extends AnimatedWidgetBaseState<_AnimatedTransform> {
-  AlignmentGeometryTween _alignment;
-  Matrix4Tween _transform;
+  late AlignmentGeometryTween _alignment;
+  late Matrix4Tween _transform;
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
     _alignment = visitor(_alignment, widget.alignment,
-        (dynamic value) => AlignmentGeometryTween(begin: value));
+        (dynamic value) => AlignmentGeometryTween(begin: value)) as AlignmentGeometryTween;
     _transform = visitor(_transform, widget.transform,
-        (dynamic value) => Matrix4Tween(begin: value));
+        (dynamic value) => Matrix4Tween(begin: value)) as Matrix4Tween;
   }
 
   @override
   Widget build(BuildContext context) {
     return Transform(
       child: widget.child,
-      transform: _transform?.evaluate(animation),
-      alignment: _alignment?.evaluate(animation),
+      transform: _transform.evaluate(animation),
+      alignment: _alignment.evaluate(animation),
       origin: widget.origin,
       transformHitTests: widget.transformHitTests,
     );
@@ -281,7 +281,7 @@ class _AnimatedTransformState
 class _AnimatedClipRRect extends ImplicitlyAnimatedWidget {
   /// The [curve] and [duration] arguments must not be null.
   _AnimatedClipRRect({
-    Key key,
+    Key? key,
     this.topLeft,
     this.topRight,
     this.bottomLeft,
@@ -290,8 +290,8 @@ class _AnimatedClipRRect extends ImplicitlyAnimatedWidget {
     this.clipBehavior,
     this.child,
     Curve curve = Curves.linear,
-    @required Duration duration,
-    VoidCallback onEnd,
+    required Duration duration,
+    VoidCallback? onEnd,
   }) : super(
           key: key,
           curve: curve,
@@ -307,14 +307,14 @@ class _AnimatedClipRRect extends ImplicitlyAnimatedWidget {
   /// will attempt to be as small as possible.
   ///
   /// {@macro flutter.widgets.child}
-  final Widget child;
+  final Widget? child;
 
-  final double topLeft;
-  final double topRight;
-  final double bottomLeft;
-  final double bottomRight;
-  final CustomClipper<RRect> clipper;
-  final Clip clipBehavior;
+  final double? topLeft;
+  final double? topRight;
+  final double? bottomLeft;
+  final double? bottomRight;
+  final CustomClipper<RRect>? clipper;
+  final Clip? clipBehavior;
 
   @override
   _AnimatedClipRRectState createState() => _AnimatedClipRRectState();
@@ -328,21 +328,21 @@ class _AnimatedClipRRect extends ImplicitlyAnimatedWidget {
 
 class _AnimatedClipRRectState
     extends AnimatedWidgetBaseState<_AnimatedClipRRect> {
-  Tween<double> _topLeft;
-  Tween<double> _topRight;
-  Tween<double> _bottomLeft;
-  Tween<double> _bottomRight;
+  late Tween<double> _topLeft;
+  late Tween<double> _topRight;
+  late Tween<double> _bottomLeft;
+  late Tween<double> _bottomRight;
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
     _topLeft = visitor(_topLeft, widget.topLeft,
-        (dynamic value) => Tween<double>(begin: value));
+        (dynamic value) => Tween<double>(begin: value)) as Tween<double>;
     _topRight = visitor(_topRight, widget.topRight,
-        (dynamic value) => Tween<double>(begin: value));
+        (dynamic value) => Tween<double>(begin: value)) as Tween<double>;
     _bottomLeft = visitor(_bottomLeft, widget.bottomLeft,
-        (dynamic value) => Tween<double>(begin: value));
+        (dynamic value) => Tween<double>(begin: value)) as Tween<double>;
     _bottomRight = visitor(_bottomRight, widget.bottomRight,
-        (dynamic value) => Tween<double>(begin: value));
+        (dynamic value) => Tween<double>(begin: value)) as Tween<double>;
   }
 
   @override
@@ -350,7 +350,7 @@ class _AnimatedClipRRectState
     return ClipRRect(
       child: widget.child,
       clipper: widget.clipper,
-      clipBehavior: widget.clipBehavior,
+      clipBehavior: widget.clipBehavior ?? Clip.antiAlias,
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(_topLeft.evaluate(animation)),
         topRight: Radius.circular(_topRight.evaluate(animation)),
@@ -373,13 +373,13 @@ class _AnimatedBackgroundBlur extends ImplicitlyAnimatedWidget {
   /// The [opacity] argument must not be null and must be between 0.0 and 1.0,
   /// inclusive. The [curve] and [duration] arguments must not be null.
   const _AnimatedBackgroundBlur({
-    Key key,
+    Key? key,
     this.child,
-    @required this.sigma,
+    required this.sigma,
     Curve curve = Curves.linear,
-    @required Duration duration,
-    VoidCallback onEnd,
-  })  : assert(sigma != null && sigma >= 0.0),
+    required Duration duration,
+    VoidCallback? onEnd,
+  })  : assert(sigma >= 0.0),
         super(
           key: key,
           curve: curve,
@@ -390,7 +390,7 @@ class _AnimatedBackgroundBlur extends ImplicitlyAnimatedWidget {
   /// The widget below this widget in the tree.
   ///
   /// {@macro flutter.widgets.child}
-  final Widget child;
+  final Widget? child;
 
   final double sigma;
 
@@ -406,12 +406,12 @@ class _AnimatedBackgroundBlur extends ImplicitlyAnimatedWidget {
 
 class _AnimatedBackgroundBlurState
     extends ImplicitlyAnimatedWidgetState<_AnimatedBackgroundBlur> {
-  Tween<double> _sigma;
+  late Tween<double> _sigma;
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
     _sigma = visitor(
-        _sigma, widget.opacity, (dynamic value) => Tween<double>(begin: value));
+        _sigma, widget.opacity, (dynamic value) => Tween<double>(begin: value)) as Tween<double>;
   }
 
   @override
@@ -432,7 +432,7 @@ class _AnimatedOverflowBox extends ImplicitlyAnimatedWidget {
   /// The [opacity] argument must not be null and must be between 0.0 and 1.0,
   /// inclusive. The [curve] and [duration] arguments must not be null.
   const _AnimatedOverflowBox({
-    Key key,
+    Key? key,
     this.child,
     this.minWidth,
     this.maxWidth,
@@ -440,8 +440,8 @@ class _AnimatedOverflowBox extends ImplicitlyAnimatedWidget {
     this.maxHeight,
     this.alignment,
     Curve curve = Curves.linear,
-    @required Duration duration,
-    VoidCallback onEnd,
+    required Duration duration,
+    VoidCallback? onEnd,
   }) : super(
           key: key,
           curve: curve,
@@ -452,12 +452,12 @@ class _AnimatedOverflowBox extends ImplicitlyAnimatedWidget {
   /// The widget below this widget in the tree.
   ///
   /// {@macro flutter.widgets.child}
-  final Widget child;
-  final AlignmentGeometry alignment;
-  final double minWidth;
-  final double maxWidth;
-  final double minHeight;
-  final double maxHeight;
+  final Widget? child;
+  final AlignmentGeometry? alignment;
+  final double? minWidth;
+  final double? maxWidth;
+  final double? minHeight;
+  final double? maxHeight;
 
   @override
   _AnimatedOverflowBoxState createState() => _AnimatedOverflowBoxState();
@@ -471,33 +471,33 @@ class _AnimatedOverflowBox extends ImplicitlyAnimatedWidget {
 
 class _AnimatedOverflowBoxState
     extends ImplicitlyAnimatedWidgetState<_AnimatedOverflowBox> {
-  Tween<double> _minWidth;
-  Tween<double> _maxWidth;
-  Tween<double> _minHeight;
-  Tween<double> _maxHeight;
-  AlignmentGeometryTween _alignment;
+   Tween<double>? _minWidth;
+   Tween<double>? _maxWidth;
+   Tween<double>? _minHeight;
+   Tween<double>? _maxHeight;
+   AlignmentGeometryTween? _alignment;
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
     _minWidth = visitor(_minWidth, widget.minWidth,
-        (dynamic value) => Tween<double>(begin: value));
+        (dynamic value) => Tween<double>(begin: value)) as Tween<double>;
     _maxWidth = visitor(_maxWidth, widget.maxWidth,
-        (dynamic value) => Tween<double>(begin: value));
+        (dynamic value) => Tween<double>(begin: value)) as Tween<double>;
     _minHeight = visitor(_minHeight, widget.minHeight,
-        (dynamic value) => Tween<double>(begin: value));
+        (dynamic value) => Tween<double>(begin: value)) as Tween<double>;
     _maxHeight = visitor(_maxHeight, widget.maxHeight,
-        (dynamic value) => Tween<double>(begin: value));
+        (dynamic value) => Tween<double>(begin: value)) as Tween<double>;
     _alignment = visitor(_alignment, widget.alignment,
-        (dynamic value) => AlignmentGeometryTween(begin: value));
+        (dynamic value) => AlignmentGeometryTween(begin: value)) as AlignmentGeometryTween;
   }
 
   @override
   Widget build(BuildContext context) {
     return OverflowBox(
-      minWidth: _minWidth.evaluate(animation),
-      maxWidth: _maxWidth.evaluate(animation),
-      minHeight: _minHeight.evaluate(animation),
-      maxHeight: _maxHeight.evaluate(animation),
-      alignment: _alignment.evaluate(animation),
+      minWidth: _minWidth?.evaluate(animation),
+      maxWidth: _maxWidth?.evaluate(animation),
+      minHeight: _minHeight?.evaluate(animation),
+      maxHeight: _maxHeight?.evaluate(animation),
+      alignment: (_alignment?.evaluate(animation))!,
       child: widget.child,
     );
   }
